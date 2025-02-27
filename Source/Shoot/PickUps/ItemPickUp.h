@@ -8,15 +8,15 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Shoot/Interfaces/IInteractable.h"
-#include "WeaponPickUp.generated.h"
+#include "ItemPickUp.generated.h"
 
 UCLASS()
-class SHOOT_API AWeaponPickUp : public AActor, public IIInteractable
+class SHOOT_API AItemPickUp : public AActor, public IIInteractable
 {
 	GENERATED_BODY()
 	
 public:	
-	AWeaponPickUp();
+	AItemPickUp();
 
 	//------------------------------------------------------------------//
 	//							Public Components						//

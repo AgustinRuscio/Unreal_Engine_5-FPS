@@ -3,12 +3,12 @@
 > UE Version: 5.5.3
 >---------------------------< */
 
-#include "WeaponPickUp.h"
+#include "ItemPickUp.h"
 #include "Shoot/Character/ShootPlayer.h"
 #include "Components/SphereComponent.h"
 
 //-----------------------------------------------------------------------------------------------
-AWeaponPickUp::AWeaponPickUp()
+AItemPickUp::AItemPickUp()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -20,10 +20,10 @@ AWeaponPickUp::AWeaponPickUp()
 }
 
 //-----------------------------------------------------------------------------------------------
-void AWeaponPickUp::Interact() { }
+void AItemPickUp::Interact() { }
 
 //-----------------------------------------------------------------------------------------------
-void AWeaponPickUp::Interact(AShootPlayer* PlayerInteractro)
+void AItemPickUp::Interact(AShootPlayer* PlayerInteractro)
 {
 	PlayerInteractro->GetWeapon();
 	Destroy();
