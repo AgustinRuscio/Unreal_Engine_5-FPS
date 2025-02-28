@@ -21,6 +21,9 @@ class SHOOT_API IIUsableItem
 
 public:
 
-	virtual void PrimaryAction() = 0;
-	virtual void SecondaryAction() = 0;
+	virtual void PrimaryActionStart() = 0;
+	virtual void PrimaryActionEnd() = 0;
+
+	virtual void SecondaryActionStart() = 0;
+	virtual void SecondaryActionEnd() = 0;
 };

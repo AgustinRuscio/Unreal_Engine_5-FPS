@@ -30,8 +30,7 @@ public:
 	//------------------------------------------------------------------//
 	//							Public Methods							//
 	//------------------------------------------------------------------//
-
-	void GetWeapon();
+	void GetUsableItem(TSubclassOf<class AUsableObject> UsableItem);
 
 	//------------------------------------------------------------------//
 	//							Public Variables						//
@@ -60,10 +59,16 @@ protected:
 	void IputActionCrouch(const FInputActionValue& Value);
 
 	UFUNCTION()
-	void IputActionPrimary(const FInputActionValue& Value);
+	void IputActionPrimaryStart(const FInputActionValue& Value);
 	
 	UFUNCTION()
-	void IputActionSecondary(const FInputActionValue& Value);
+	void IputActionPrimaryEnd(const FInputActionValue& Value);
+	
+	UFUNCTION()
+	void IputActionSecondaryStart(const FInputActionValue& Value);
+
+	UFUNCTION()
+	void IputActionSecondaryEnd(const FInputActionValue& Value);
 
 	//------------------------------------------------------------------//
 	//						Protected Variables							//
@@ -107,4 +112,7 @@ private:
 	float TraceDistance = 1000.f;
 
 	class IIInteractable* CurretnInteractable = nullptr;
+
+	class AUsableObject* CurrentUsable;
+
 };

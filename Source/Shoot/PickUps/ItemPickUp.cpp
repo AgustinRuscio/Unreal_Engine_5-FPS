@@ -5,6 +5,7 @@
 
 #include "ItemPickUp.h"
 #include "Shoot/Character/ShootPlayer.h"
+#include "Shoot/GameObjects/UsableObject.h"
 #include "Components/SphereComponent.h"
 
 //-----------------------------------------------------------------------------------------------
@@ -25,6 +26,6 @@ void AItemPickUp::Interact() { }
 //-----------------------------------------------------------------------------------------------
 void AItemPickUp::Interact(AShootPlayer* PlayerInteractro)
 {
-	PlayerInteractro->GetWeapon();
+	PlayerInteractro->GetUsableItem(UsableItem);
 	Destroy();
 }

@@ -45,4 +45,6 @@ private:
 	//							Private Variables						//
 	//------------------------------------------------------------------//
 
+	UPROPERTY(EditDefaultsOnly, Category = "Settings")
+	TSubclassOf<class AUsableObject> UsableItem;
 };

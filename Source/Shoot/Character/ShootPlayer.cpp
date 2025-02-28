@@ -8,6 +8,7 @@
 #include <Camera/CameraComponent.h>
 #include "Components/CapsuleComponent.h"
 #include "Shoot/Interfaces/IInteractable.h"
+#include "Shoot/GameObjects/UsableObject.h"
 #include <Shoot/Framework/ShootController.h>
 #include "GameFramework/CharacterMovementComponent.h"
 #include <EnhancedInputComponent.h>
@@ -47,9 +48,14 @@ void AShootPlayer::Tick(float DeltaTime)
 }
 
 //-----------------------------------------------------------------------------------------------
-void AShootPlayer::GetWeapon()
+void AShootPlayer::GetUsableItem(TSubclassOf<class AUsableObject> UsableItem)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Get Weapon"));
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Get Usable"));
+	
+	FVector SpawnLocation = GetActorLocation();
+	FRotator SpawnRotation = FRotator::ZeroRotator;
+
+	CurrentUsable = GetWorld()->SpawnActor<AUsableObject>(UsableItem, SpawnLocation, SpawnRotation);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -70,9 +76,14 @@ void AShootPlayer::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 		EnhancedInputComponent->BindAction(CrouchAction, ETriggerEvent::Completed, this, &AShootPlayer::IputActionCrouch);
 
 		// Primary Action
-		EnhancedInputComponent->BindAction(PrimaryAction, ETriggerEvent::Started, this, &AShootPlayer::IputActionPrimary);
+		EnhancedInputComponent->BindAction(PrimaryAction, ETriggerEvent::Started, this, &AShootPlayer::IputActionPrimaryStart);
 
-		EnhancedInputComponent->BindAction(SecondaryAction, ETriggerEvent::Started, this, &AShootPlayer::IputActionSecondary);
+		EnhancedInputComponent->BindAction(PrimaryAction, ETriggerEvent::Completed, this, &AShootPlayer::IputActionPrimaryEnd);
+
+		// Secondary Action
+		EnhancedInputComponent->BindAction(SecondaryAction, ETriggerEvent::Started, this, &AShootPlayer::IputActionSecondaryStart);
+
+		EnhancedInputComponent->BindAction(SecondaryAction, ETriggerEvent::Completed, this, &AShootPlayer::IputActionSecondaryEnd);
 	}
 }
 
@@ -118,15 +129,30 @@ void AShootPlayer::IputActionCrouch(const FInputActionValue& Value)
 }
 
 //-----------------------------------------------------------------------------------------------
-void AShootPlayer::IputActionPrimary(const FInputActionValue& Value)
+void AShootPlayer::IputActionPrimaryStart(const FInputActionValue& Value)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Primary Action"));
 }
 
 //-----------------------------------------------------------------------------------------------
-void AShootPlayer::IputActionSecondary(const FInputActionValue& Value)
+void AShootPlayer::IputActionPrimaryEnd(const FInputActionValue& Value)
+{
+}
+
+//-----------------------------------------------------------------------------------------------
+void AShootPlayer::IputActionSecondaryStart(const FInputActionValue& Value)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Secondary Action"));
+
+	if(CurrentUsable)
+		CurrentUsable->SecondaryActionStart();
+}
+
+//-----------------------------------------------------------------------------------------------
+void AShootPlayer::IputActionSecondaryEnd(const FInputActionValue& Value)
+{
+	if (CurrentUsable)
+		CurrentUsable->SecondaryActionEnd();
 }
 
 //-----------------------------------------------------------------------------------------------
