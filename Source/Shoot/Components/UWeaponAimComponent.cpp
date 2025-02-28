@@ -5,59 +5,66 @@
 
 #include "UWeaponAimComponent.h"
 #include <Camera/CameraComponent.h>
+#include <Components/ArrowComponent.h>
+#include "GameFramework/Character.h"
 #include "Math/UnrealMathUtility.h"
 
 
 //-----------------------------------------------------------------------------------------------
-UUWeaponAimComponent::UUWeaponAimComponent()
+UUWeaponAimComponent::UUWeaponAimComponent() : OriginalFOV(90.f), AimFOV(50.f)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
+FTimeline& UUWeaponAimComponent::Gettimeline()
+{
+	return MoveNeedleTimeLine;
+}
 
 //-----------------------------------------------------------------------------------------------
-void UUWeaponAimComponent::SetValues(FVector CameraLocation, FVector AimLocation, UCameraComponent* Camera, UCurveFloat* TimeLineCurveFloat)
+void UUWeaponAimComponent::InitializeValues()
 {
-	OriginalCameraLocation = CameraLocation;
-	AimCameraLocation = AimLocation;
-	PlayerCamera = Camera;
-	CurveFloat = TimeLineCurveFloat;
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+
+	if (!PlayerController) return;
+
+	PlayerCamera = PlayerController->GetCharacter()->FindComponentByClass<UCameraComponent>();
+
+	if (!PlayerCamera) return;
+
+	OriginalFOV = PlayerCamera->FieldOfView;
+
+	FOnTimelineFloat CameraTargetTick;
+	CameraTargetTick.BindUFunction(this, FName("MoveNeedleTimeLineTick"));
+	MoveNeedleTimeLine.AddInterpFloat(CurveFloat, CameraTargetTick);
+
+	FOnTimelineEventStatic CameraTargettingFinished;
+	CameraTargettingFinished.BindUFunction(this, FName("MoveNeedleTimeLineFinished"));
+	MoveNeedleTimeLine.SetTimelineFinishedFunc(CameraTargettingFinished);
+}
+
+//-----------------------------------------------------------------------------------------------
+void UUWeaponAimComponent::SetCameraFOV(float cameraFOV)
+{
+	OriginalFOV = cameraFOV;
 }
 
 //-----------------------------------------------------------------------------------------------
 void UUWeaponAimComponent::ActionStart()
 {
-	if (MoveCameraTimeLine.IsPlaying())
-	{
-		MoveCameraTimeLine.Stop();
-	}
-
-	MoveCameraTimeLine.Play();
+	MoveNeedleTimeLine.Play();
 }
 
 //-----------------------------------------------------------------------------------------------
 void UUWeaponAimComponent::ActionEnd()
 {
-	if (MoveCameraTimeLine.IsPlaying())
-	{
-		MoveCameraTimeLine.Stop();
-	}
-
-	MoveCameraTimeLine.Reverse();
+	MoveNeedleTimeLine.Reverse();
 }
 
-//-----------------------------------------------------------------------------------------------
 void UUWeaponAimComponent::BeginPlay()
 {
-	Super::BeginPlay();
-
-	FOnTimelineFloat CameraTargetTick;
-	CameraTargetTick.BindUFunction(this, FName("MoveCameraTimeLineTick"));
-	MoveCameraTimeLine.AddInterpFloat(CurveFloat, CameraTargetTick);
-
-	FOnTimelineEventStatic CameraTargettingFinished;
-	CameraTargettingFinished.BindUFunction(this, FName("MoveCameraTimeLineFinished"));
-	MoveCameraTimeLine.SetTimelineFinishedFunc(CameraTargettingFinished);
+	RegisterComponent();
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -65,16 +72,16 @@ void UUWeaponAimComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	MoveCameraTimeLine.TickTimeline(DeltaTime);
+	MoveNeedleTimeLine.TickTimeline(DeltaTime);
 }
 
 //-----------------------------------------------------------------------------------------------
-void UUWeaponAimComponent::MoveCameraTimeLineTick(float deltaTime)
+void UUWeaponAimComponent::MoveNeedleTimeLineTick(float deltaTime)
 {
-	auto NewLocation = FMath::Lerp(OriginalCameraLocation, AimCameraLocation, deltaTime);
+	auto NewFOV = FMath::Lerp(OriginalFOV, AimFOV, deltaTime);
 
-	PlayerCamera->SetWorldLocation(NewLocation);
+	PlayerCamera->SetFieldOfView(NewFOV);
 }
 
 //-----------------------------------------------------------------------------------------------
-void UUWeaponAimComponent::MoveCameraTimeLineFinished() { }
+void UUWeaponAimComponent::MoveNeedleTimeLineFinished() { }

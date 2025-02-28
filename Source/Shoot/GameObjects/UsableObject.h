@@ -22,7 +22,7 @@ public:
 	//							Public Components						//
 	//------------------------------------------------------------------//
 
-	UPROPERTY(EditDefaultsOnly, Category = Components, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = Components, meta = (AllowPrivateAccess = "true"))
 	class USkeletalMeshComponent* ObjectMesh;
 
 	//------------------------------------------------------------------//

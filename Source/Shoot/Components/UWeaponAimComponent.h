@@ -8,12 +8,11 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/TimelineComponent.h"
-#include "Shoot/Interfaces/IWeaponSecondatyAction.h"
 #include "UWeaponAimComponent.generated.h"
 
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SHOOT_API UUWeaponAimComponent : public UActorComponent, public IIWeaponSecondatyAction
+class SHOOT_API UUWeaponAimComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
@@ -23,12 +22,14 @@ public:
 	//------------------------------------------------------------------//
 	//							Public Methods							//
 	//------------------------------------------------------------------//
-	
-	virtual void SetValues() override { };
-	virtual void SetValues(FVector CameraLocation, FVector AimLocation, class UCameraComponent* Camera, class UCurveFloat* TimeLineCurveFloat);
+	FTimeline& Gettimeline();
 
-	virtual void ActionStart() override;
-	virtual void ActionEnd() override;
+	void InitializeValues();
+
+	void SetCameraFOV(float cameraFOV);
+
+	void ActionStart();
+	void ActionEnd();
 
 	//------------------------------------------------------------------//
 	//							Public Variables						//
@@ -38,26 +39,29 @@ private:
 	//------------------------------------------------------------------//
 	//							Private Methods							//
 	//------------------------------------------------------------------//
-
 	virtual void BeginPlay() override;
 
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()
-	void MoveCameraTimeLineTick(float deltaTime);
+	void MoveNeedleTimeLineTick(float deltaTime);
 	
 	UFUNCTION()
-	void MoveCameraTimeLineFinished();
+	void MoveNeedleTimeLineFinished();
 
 	//------------------------------------------------------------------//
 	//							Private Variables						//
 	//------------------------------------------------------------------//
 
-	FVector OriginalCameraLocation;
-	FVector AimCameraLocation;
+	float OriginalFOV;
+
+	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	float AimFOV;
+
+	FTimeline MoveNeedleTimeLine;
+
+		UPROPERTY(EditAnywhere, Category = "Settings")
+	UCurveFloat* CurveFloat;
 
 	class UCameraComponent* PlayerCamera;
-
-	FTimeline MoveCameraTimeLine;
-	UCurveFloat* CurveFloat;
 };

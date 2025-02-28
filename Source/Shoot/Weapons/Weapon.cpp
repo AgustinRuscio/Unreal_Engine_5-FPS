@@ -4,80 +4,86 @@
 >---------------------------< */
 
 #include "Weapon.h"
-#include <Camera/CameraComponent.h>
-#include <Components/ArrowComponent.h>
 #include "Shoot/Components/UWeaponAimComponent.h"
+#include "Components/TimelineComponent.h"
+#include "Shoot/Components/UShootComponent.h"
 #include <Shoot/Character/ShootPlayer.h>
 
 //-----------------------------------------------------------------------------------------------
-AWeapon::AWeapon() : bIsBot(false), SecondaryActionType(ESecondaryAction::ESA_None), CurrentSecondaryAction(nullptr)
+AWeapon::AWeapon()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
-	AimCameraLocation = CreateDefaultSubobject<UArrowComponent>("AimLocation");
-	AimCameraLocation->SetupAttachment(ObjectMesh);
+	ShootComponent = CreateDefaultSubobject<UUShootComponent>(TEXT("ShootComponent"));
+	
+	AimComponent = CreateDefaultSubobject<UUWeaponAimComponent>("AimComponent");
+	
+	
 }
 
 //-----------------------------------------------------------------------------------------------
 void AWeapon::PrimaryActionStart()
 {
+	ShootComponent->StartShoot();
 }
 
 //-----------------------------------------------------------------------------------------------
 void AWeapon::PrimaryActionEnd()
 {
+	ShootComponent->EndShoot();
 }
 
 //-----------------------------------------------------------------------------------------------
 void AWeapon::SecondaryActionStart()
 {
-	if(CurrentSecondaryAction)
-		CurrentSecondaryAction->ActionStart();
+	switch (SecondaryActionType)
+	{
+	case ESecondaryAction::ESA_Aim:
+		AimComponent->ActionStart();
+		break;
+
+	case ESecondaryAction::ESA_ChangeShootBehavior:
+		ShootComponent->SwitchShootBehavior();
+		break;
+
+	case ESecondaryAction::ESA_None:
+	default:
+		break;
+	}
+;
 }
 
 //-----------------------------------------------------------------------------------------------
 void AWeapon::SecondaryActionEnd()
 {
-	if (CurrentSecondaryAction)
-		CurrentSecondaryAction->ActionEnd();
+	switch (SecondaryActionType)
+	{
+	case ESecondaryAction::ESA_Aim:
+		AimComponent->ActionEnd();
+		break;
+
+	case ESecondaryAction::ESA_None:
+	case ESecondaryAction::ESA_ChangeShootBehavior:
+	default:
+		break;
+	}
 }
 
 //-----------------------------------------------------------------------------------------------
 void AWeapon::BeginPlay()
 {
-	if (!bIsBot)
-	{
-		switch (SecondaryActionType)
-		{
-		case ESecondaryAction::ESA_Aim:
-			PrepareAimCofig();
-			break;
+	Super::BeginPlay();
 
-		case ESecondaryAction::ESA_ChangeShootBehavior:
-			break;
-
-		case ESecondaryAction::ESA_None:
-		default:
-			CurrentSecondaryAction = nullptr;
-			break;
-		}
-	}
+	ShootComponent->SetOwner(GetOwner());
+	AimComponent->InitializeValues();
 }
 
-void AWeapon::PrepareAimCofig()
+void AWeapon::Tick(float DeltaSeconds)
 {
-	auto AimComp = NewObject<UUWeaponAimComponent>(this);
-	AimComp->RegisterComponent();
+	Super::Tick(DeltaSeconds);
+}
 
-	CurrentSecondaryAction = AimComp;
-
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-
-	if (!PlayerController) return;
-	
-	APlayerCameraManager* CameraManager = PlayerController->PlayerCameraManager;
-
-	if (!CameraManager) return;
-
-	CurrentSecondaryAction->SetValues(CameraManager->GetCameraLocation(), AimCameraLocation->GetComponentLocation(), PlayerController->GetCharacter()->GetComponentByClass<UCameraComponent>(), AimCurveFloat);
+//-----------------------------------------------------------------------------------------------
+void AWeapon::InitializeComponents()
+{
 }

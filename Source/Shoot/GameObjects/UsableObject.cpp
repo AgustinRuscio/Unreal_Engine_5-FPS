@@ -11,7 +11,6 @@ AUsableObject::AUsableObject()
 	PrimaryActorTick.bCanEverTick = true;
 
 	ObjectMesh = CreateDefaultSubobject<USkeletalMeshComponent>("Object Mesh");
-	RootComponent = ObjectMesh;
 }
 
 //-----------------------------------------------------------------------------------------------

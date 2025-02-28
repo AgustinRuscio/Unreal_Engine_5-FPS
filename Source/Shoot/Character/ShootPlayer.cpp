@@ -55,7 +55,11 @@ void AShootPlayer::GetUsableItem(TSubclassOf<class AUsableObject> UsableItem)
 	FVector SpawnLocation = GetActorLocation();
 	FRotator SpawnRotation = FRotator::ZeroRotator;
 
-	CurrentUsable = GetWorld()->SpawnActor<AUsableObject>(UsableItem, SpawnLocation, SpawnRotation);
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+
+	CurrentUsable = GetWorld()->SpawnActor<AUsableObject>(UsableItem, SpawnLocation, SpawnRotation, SpawnParams);
+	CurrentUsable->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -105,7 +109,6 @@ void AShootPlayer::InputLook(FVector2D value)
 //-----------------------------------------------------------------------------------------------
 void AShootPlayer::InputInteract()
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Interact Action"));
 	if (CurretnInteractable)
 		CurretnInteractable->Interact(this);
 }
@@ -131,19 +134,20 @@ void AShootPlayer::IputActionCrouch(const FInputActionValue& Value)
 //-----------------------------------------------------------------------------------------------
 void AShootPlayer::IputActionPrimaryStart(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Primary Action"));
+	if (CurrentUsable)
+		CurrentUsable->PrimaryActionStart();
 }
 
 //-----------------------------------------------------------------------------------------------
 void AShootPlayer::IputActionPrimaryEnd(const FInputActionValue& Value)
 {
+	if (CurrentUsable)
+		CurrentUsable->PrimaryActionEnd();
 }
 
 //-----------------------------------------------------------------------------------------------
 void AShootPlayer::IputActionSecondaryStart(const FInputActionValue& Value)
 {
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Secondary Action"));
-
 	if(CurrentUsable)
 		CurrentUsable->SecondaryActionStart();
 }

@@ -29,9 +29,11 @@ public:
 	//------------------------------------------------------------------//
 	//							Public Components						//
 	//------------------------------------------------------------------//
+	UPROPERTY(VisibleAnywhere)
+	class UUShootComponent* ShootComponent;
 
-	UPROPERTY(EditDefaultsOnly, Category = Components, meta = (AllowPrivateAccess = "true"))
-	class UArrowComponent* AimCameraLocation;
+	UPROPERTY(VisibleAnywhere)
+	class UUWeaponAimComponent* AimComponent;
 
 	//------------------------------------------------------------------//
 	//							Public Methods							//
@@ -54,20 +56,13 @@ private:
 	//------------------------------------------------------------------//
 
 	virtual void BeginPlay() override;
-
-	void PrepareAimCofig();
+	virtual void Tick(float DeltaSeconds) override;
+	void InitializeComponents();
 
 	//------------------------------------------------------------------//
 	//							Private Variables						//
 	//------------------------------------------------------------------//
 
-	bool bIsBot;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon Settings")
-	ESecondaryAction SecondaryActionType;
-
-	class IIWeaponSecondatyAction* CurrentSecondaryAction;
-
 	UPROPERTY(EditDefaultsOnly, Category = Components, meta = (AllowPrivateAccess = "true"))
-	class UCurveFloat* AimCurveFloat;
+	ESecondaryAction SecondaryActionType;
 };
