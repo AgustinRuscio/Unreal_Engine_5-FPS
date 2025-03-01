@@ -63,6 +63,6 @@ private:
 	//							Private Variables						//
 	//------------------------------------------------------------------//
 
-	UPROPERTY(EditDefaultsOnly, Category = Components, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = Settings, meta = (AllowPrivateAccess = "true"))
 	ESecondaryAction SecondaryActionType;
 };
