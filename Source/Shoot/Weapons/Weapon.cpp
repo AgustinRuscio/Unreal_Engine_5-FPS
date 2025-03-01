@@ -17,8 +17,6 @@ AWeapon::AWeapon()
 	ShootComponent = CreateDefaultSubobject<UUShootComponent>(TEXT("ShootComponent"));
 	
 	AimComponent = CreateDefaultSubobject<UUWeaponAimComponent>("AimComponent");
-	
-	
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -74,10 +72,10 @@ void AWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ShootComponent->SetOwner(GetOwner());
-	AimComponent->InitializeValues();
+	InitializeComponents();
 }
 
+//-----------------------------------------------------------------------------------------------
 void AWeapon::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
@@ -86,4 +84,6 @@ void AWeapon::Tick(float DeltaSeconds)
 //-----------------------------------------------------------------------------------------------
 void AWeapon::InitializeComponents()
 {
+	ShootComponent->SetOwner(GetOwner());
+	AimComponent->InitializeValues();
 }

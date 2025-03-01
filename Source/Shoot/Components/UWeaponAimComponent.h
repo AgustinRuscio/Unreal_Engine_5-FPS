@@ -22,8 +22,6 @@ public:
 	//------------------------------------------------------------------//
 	//							Public Methods							//
 	//------------------------------------------------------------------//
-	FTimeline& Gettimeline();
-
 	void InitializeValues();
 
 	void SetCameraFOV(float cameraFOV);
@@ -39,8 +37,6 @@ private:
 	//------------------------------------------------------------------//
 	//							Private Methods							//
 	//------------------------------------------------------------------//
-	virtual void BeginPlay() override;
-
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UFUNCTION()

@@ -17,11 +17,6 @@ UUWeaponAimComponent::UUWeaponAimComponent() : OriginalFOV(90.f), AimFOV(50.f)
 	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
-FTimeline& UUWeaponAimComponent::Gettimeline()
-{
-	return MoveNeedleTimeLine;
-}
-
 //-----------------------------------------------------------------------------------------------
 void UUWeaponAimComponent::InitializeValues()
 {
@@ -60,11 +55,6 @@ void UUWeaponAimComponent::ActionStart()
 void UUWeaponAimComponent::ActionEnd()
 {
 	MoveNeedleTimeLine.Reverse();
-}
-
-void UUWeaponAimComponent::BeginPlay()
-{
-	RegisterComponent();
 }
 
 //-----------------------------------------------------------------------------------------------

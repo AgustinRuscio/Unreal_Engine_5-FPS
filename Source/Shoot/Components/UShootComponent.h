@@ -9,6 +9,14 @@
 #include "Components/ActorComponent.h"
 #include "UShootComponent.generated.h"
 
+UENUM(BlueprintType)
+enum class EShootType : uint8
+{
+	EST_SemiAutomatic,
+	EST_Automatic,
+	EST_Burst
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SHOOT_API UUShootComponent : public UActorComponent
 {
@@ -37,6 +45,8 @@ private:
 	void AutomaticShootStart();
 	void AutomaticShootEnd();
 
+	void BurstShoot();
+
 	void PerformShoot();
 
 	void CalculateSpread();
@@ -47,10 +57,10 @@ private:
 	//							Private Variables						//
 	//------------------------------------------------------------------//
 	UPROPERTY(EditDefaultsOnly, Category = Settings)
-	bool bIsAutomatic = false;
+	int NumberOfBullets = 1;
 
 	UPROPERTY(EditDefaultsOnly, Category = Settings)
-	int NumberOfBullets = 1;
+	int BurstAmount = 3;
 
 	UPROPERTY(EditDefaultsOnly, Category = Settings)
 	float ShootDistance = 1000.f;
@@ -75,7 +85,14 @@ private:
 
 	float LastShootTime = 0.f;
 
+	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	EShootType PrimaryShootType;
+
+	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	EShootType SecondaryShootType;
+
 	AActor* OwnerPlayer;
 
 	FTimerHandle AutomaticShootTimerHandle;
+	FTimerHandle BurstShootTimerHandle;
 };

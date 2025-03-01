@@ -11,12 +11,13 @@
 
 namespace
 {
+    int CurrentBurstCount = 0.f;
     float TimeShootDiff = 0.;
     float SpreadAngle = 0.f;
 }
 
 //-----------------------------------------------------------------------------------------------
-UUShootComponent::UUShootComponent() : bIsAutomatic(false), NumberOfBullets(0), ShootDistance(1000.f), FireRate(0.2f), SpreadAngleMin(0.f), SpreadAngleMax(5.f), SpreadPreShootIncrease(1.f), ShootRadius(2.f), DamagePerBullet(10.f), LastShootTime(0.f), OwnerPlayer(nullptr)
+UUShootComponent::UUShootComponent() : NumberOfBullets(0), ShootDistance(1000.f), FireRate(0.2f), SpreadAngleMin(0.f), SpreadAngleMax(5.f), SpreadPreShootIncrease(1.f), ShootRadius(2.f), DamagePerBullet(10.f), LastShootTime(0.f), PrimaryShootType(EShootType::EST_SemiAutomatic), SecondaryShootType(EShootType::EST_SemiAutomatic), OwnerPlayer(nullptr)
 {
     PrimaryComponentTick.bCanEverTick = true;
 
@@ -33,20 +34,44 @@ void UUShootComponent::SetOwner(AActor* WeaponOwner)
 //-----------------------------------------------------------------------------------------------
 void UUShootComponent::StartShoot()
 {
-    bIsAutomatic ? AutomaticShootStart() : PerformShoot();
+    switch (PrimaryShootType)
+    {
+	case EShootType::EST_Automatic:
+        AutomaticShootStart();
+		break;
+	case EShootType::EST_Burst:
+        BurstShoot();
+		break;
+
+	case EShootType::EST_SemiAutomatic:
+	default:
+        PerformShoot();
+		break;
+    }
 }
 
 //-----------------------------------------------------------------------------------------------
 void UUShootComponent::EndShoot()
 {
-    if (bIsAutomatic)
+    switch (PrimaryShootType)
+    {
+    case EShootType::EST_Automatic:
         AutomaticShootEnd();
+        break;
+
+    case EShootType::EST_Burst:
+    case EShootType::EST_SemiAutomatic:
+    default:
+        break;
+    }
 }
 
 //-----------------------------------------------------------------------------------------------
 void UUShootComponent::SwitchShootBehavior()
 {
-    bIsAutomatic = !bIsAutomatic;
+    EShootType AuxShootType = PrimaryShootType;
+    PrimaryShootType = SecondaryShootType;
+    SecondaryShootType = AuxShootType;
 }
 #pragma endregion
 
@@ -65,6 +90,36 @@ void UUShootComponent::AutomaticShootEnd()
         GetWorld()->GetTimerManager().ClearTimer(AutomaticShootTimerHandle);
     
     SpreadAngle = SpreadAngleMin;
+}
+
+//-----------------------------------------------------------------------------------------------
+void UUShootComponent::BurstShoot()
+{
+    CurrentBurstCount = 0;
+
+    if (!GetWorld()->GetTimerManager().IsTimerActive(BurstShootTimerHandle))
+    {
+        FTimerDelegate BurstDel;
+        BurstDel.BindLambda([this]
+            {
+                if (CurrentBurstCount >= BurstAmount)
+                {
+                    GetWorld()->GetTimerManager().ClearTimer(BurstShootTimerHandle);
+                    return;
+                }
+
+                PerformShoot();
+                CurrentBurstCount++;
+            });
+
+        GetWorld()->GetTimerManager().SetTimer(
+            BurstShootTimerHandle,
+            BurstDel,
+            FireRate,
+            true, 
+            0.f
+        );
+    }
 }
 
 //-----------------------------------------------------------------------------------------------
@@ -125,7 +180,18 @@ void UUShootComponent::PerformShoot() // Mover A RPC
 //-----------------------------------------------------------------------------------------------
 void UUShootComponent::CalculateSpread()
 {
-    bIsAutomatic ? CalculateAutomaticSpread() : CalculateSemiAutomaticSpread();
+    switch (PrimaryShootType)
+    {
+    case EShootType::EST_Automatic:
+    case EShootType::EST_Burst:
+        CalculateAutomaticSpread();
+        break;
+
+    case EShootType::EST_SemiAutomatic:
+    default:
+        CalculateSemiAutomaticSpread();
+        break;
+    }
 }
 
 //-----------------------------------------------------------------------------------------------
