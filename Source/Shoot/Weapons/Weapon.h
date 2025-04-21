@@ -38,7 +38,6 @@ public:
 	//------------------------------------------------------------------//
 	//							Public Methods							//
 	//------------------------------------------------------------------//
-
 	virtual void PrimaryActionStart() override;
 	virtual void PrimaryActionEnd() override;
 
@@ -50,11 +49,9 @@ public:
 	//------------------------------------------------------------------//
 
 private:
-
 	//------------------------------------------------------------------//
 	//							Private Methods							//
 	//------------------------------------------------------------------//
-
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
 	void InitializeComponents();

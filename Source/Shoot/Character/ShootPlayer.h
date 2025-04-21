@@ -30,7 +30,7 @@ public:
 	//------------------------------------------------------------------//
 	//							Public Methods							//
 	//------------------------------------------------------------------//
-	void GetUsableItem(TSubclassOf<class AUsableObject> UsableItem);
+	void GetUsableItem(TSubclassOf<class AUsableObject> UsableItem, FName& SocketName);
 
 	//------------------------------------------------------------------//
 	//							Public Variables						//
@@ -108,7 +108,7 @@ private:
 	//							Private Variables						//
 	//------------------------------------------------------------------//
 
-	UPROPERTY(EditDefaultsOnly, Category = "Settings")
+	UPROPERTY(EditDefaultsOnly, Category = Setting)
 	float TraceDistance = 1000.f;
 
 	class IIInteractable* CurretnInteractable = nullptr;

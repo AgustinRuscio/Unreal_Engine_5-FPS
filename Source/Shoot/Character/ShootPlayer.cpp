@@ -48,18 +48,16 @@ void AShootPlayer::Tick(float DeltaTime)
 }
 
 //-----------------------------------------------------------------------------------------------
-void AShootPlayer::GetUsableItem(TSubclassOf<class AUsableObject> UsableItem)
+void AShootPlayer::GetUsableItem(TSubclassOf<class AUsableObject> UsableItem, FName& SocketName)
 {
 	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Get Usable"));
-	
-	FVector SpawnLocation = GetActorLocation();
-	FRotator SpawnRotation = FRotator::ZeroRotator;
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.Owner = this;
+	SpawnParams.Instigator = this;
 
-	CurrentUsable = GetWorld()->SpawnActor<AUsableObject>(UsableItem, SpawnLocation, SpawnRotation, SpawnParams);
-	CurrentUsable->AttachToActor(this, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+	CurrentUsable = GetWorld()->SpawnActor<AUsableObject>(UsableItem, GetMesh()->GetSocketTransform(SocketName), SpawnParams);
+	CurrentUsable->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, SocketName);
 }
 
 //-----------------------------------------------------------------------------------------------

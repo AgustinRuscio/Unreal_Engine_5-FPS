@@ -45,6 +45,9 @@ private:
 	//							Private Variables						//
 	//------------------------------------------------------------------//
 
-	UPROPERTY(EditDefaultsOnly, Category = "Settings")
+	UPROPERTY(EditDefaultsOnly, Category = Settings)
+	FName SocketName;
+
+	UPROPERTY(EditDefaultsOnly, Category = Settings)
 	TSubclassOf<class AUsableObject> UsableItem;
 };

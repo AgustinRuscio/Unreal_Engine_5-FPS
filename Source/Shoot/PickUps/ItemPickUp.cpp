@@ -26,6 +26,6 @@ void AItemPickUp::Interact() { }
 //-----------------------------------------------------------------------------------------------
 void AItemPickUp::Interact(AShootPlayer* PlayerInteractro)
 {
-	PlayerInteractro->GetUsableItem(UsableItem);
+	PlayerInteractro->GetUsableItem(UsableItem, SocketName);
 	Destroy();
 }
